@@ -16,7 +16,8 @@ import java.util.Map;
  */
 public class PhoneBillServlet extends HttpServlet
 {
-    private final Map<String, String> data = new HashMap<>();
+    //private final Map<String, String> data = new HashMap<>();
+    private final Map<String, phonebill> data = new HashMap<String, phonebill>();
 
     /**
      * Handles an HTTP GET request from a client by writing the value of the key
@@ -29,6 +30,7 @@ public class PhoneBillServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
+        
         String key = getParameter( "key", request );
         if (key != null) {
             writeValue(key, response);
