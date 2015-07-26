@@ -62,4 +62,9 @@ public class Project4Test extends InvokeMainTestCase {
         assertThat(out, out, containsString(Messages.getMappingCount(1)));
         assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
     }
+    @Test
+    public void Testy(){
+        MainMethodResult result = invokeMain(Project4.class,HOSTNAME,PORT, "stuff", "things");
+        System.out.println(result.getOut());
+    }
 }
