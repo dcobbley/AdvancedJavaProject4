@@ -13,6 +13,7 @@ import java.util.*;
 public class phonebill extends AbstractPhoneBill{
     String customer;
     ArrayList<phonecall> phoneCalls;
+    phonecall searchCallOnly;
 
     /**
      * Constructor is essentially a setter function. creates a new list which will hold all additional phonecalls.
@@ -24,17 +25,28 @@ public class phonebill extends AbstractPhoneBill{
         this.customer = customer;
         phoneCalls = new ArrayList<phonecall>();
         addPhoneCall(phoneCall);
+        searchCallOnly=null;
     }
     phonebill(String customer)
     {
         this.customer = customer;
         phoneCalls = new ArrayList<phonecall>();
+        searchCallOnly=null;
     }
     phonebill()
     {
         //Create an empty phonebill
         customer = "";
         phoneCalls = new ArrayList<phonecall>();
+        searchCallOnly=null;
+    }
+
+    public phonebill(String customer, phonecall tempPhoneCall, String s) {
+        if(s.equals("-search")) {
+            this.customer = customer;
+            phoneCalls = null;
+            searchCallOnly = tempPhoneCall;
+        }
     }
 
     /**

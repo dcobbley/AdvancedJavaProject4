@@ -3,6 +3,7 @@ package edu.pdx.cs410J.dcobbley;
 import edu.pdx.cs410J.web.HttpRequestHelper;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A helper class for accessing the rest client.  Note that this class provides
@@ -38,13 +39,42 @@ public class PhoneBillRestClient extends HttpRequestHelper
     /**
      * Returns all values for the given key
      */
-    public Response getValues( String customer, String startTime, String endTime ) throws IOException
+    public Response getValues( phonebill bill ) throws IOException
     {
-        return get(this.url, "customer", customer, "startTime", startTime, "endTime", endTime);
+        try {
+            //Search was properly handled.
+            if (bill.searchCallOnly != null)
+                return get(this.url, "customer", bill.getCustomer(), "startTime", bill.searchCallOnly.getStartTimeString(), "endTime", bill.searchCallOnly.getEndTimeString());
+            else {//need to look inside of bill, may contain a list of phonecalls
+                if (bill.getPhoneCalls().size() > 1)
+                    throw new Exception("Please specify search parameters");
+
+                else{
+                    Collection<phonecall> tempPhoneCalls = bill.getPhoneCalls();
+                    phonecall tempCall=null;
+                    boolean flag = false;
+                    for(phonecall call: tempPhoneCalls){
+                        if(flag)
+                            throw new Exception("Please provide one set of data to search for");
+
+                        flag=true;
+                        tempCall=call;
+                    }
+                    return get(this.url, "customer", bill.getCustomer(), "startTime", tempCall.getStartTimeString(), "endTime", tempCall.getEndTimeString());
+                }
+            }
+        }
+        catch(Exception ex){
+            System.out.println(ex.getMessage());
+            System.exit(1);
+            return null;
+        }
     }
 
-    public Response addKeyValuePair( String customer, String caller, String callee, String startTime, String endTime ) throws IOException
+    public Response addKeyValuePair( phonebill bill ) throws IOException
     {
-        return post( this.url, "customer", customer,"caller", caller, "callee", callee, "startTime", startTime, "endTime", endTime );
+        //return post( this.url, "customer", customer,"caller", caller, "callee", callee, "startTime", startTime, "endTime", endTime );
+
+        return null;
     }
 }

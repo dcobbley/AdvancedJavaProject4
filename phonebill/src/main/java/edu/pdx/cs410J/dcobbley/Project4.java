@@ -203,7 +203,7 @@ public class Project4 {
         try{
             phonecall tempPhoneCall = new phonecall();
             tempPhoneCall.setDate(args[element++] + " " + args[element++]+ " "+ args[element++],args[element++] + " " + args[element++]+ " "+ args[element++]);
-            MySearchBill = new phonebill(args[element++], tempPhoneCall);
+            MySearchBill = new phonebill(args[element++], tempPhoneCall,"-search");
         }
         catch(IllegalArgumentException ex){
             if(ex.getMessage()!= null)
