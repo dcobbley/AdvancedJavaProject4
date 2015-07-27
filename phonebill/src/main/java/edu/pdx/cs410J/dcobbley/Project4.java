@@ -17,7 +17,6 @@ public class Project4 {
     static ArrayList<String> commands; //used to keep track of all the commands that will be run at the end of the program
     static phonebill MyPhoneBill;//keep a local copy of the customer to be added
     static phonebill MySearchBill;//keep a local copy of the customer that we are looking for, only used for -search command
-    static PhoneBillRestClient client;
 
     public static void main(String... args) {
         setGlobalsToNull();
@@ -27,29 +26,7 @@ public class Project4 {
 
 
 
-        HttpRequestHelper.Response response;
-        try {
-            if (customer == null) {
-                // Print all key/value pairs
-                response = client.getAllKeysAndValues();
 
-            } else if (caller == null) {
-                // Print all values of key
-                response = client.getValues(customer,startTime,endTime);
-
-            } else {
-                // Post the key/value pair
-                response = client.addKeyValuePair(customer, caller, callee, startTime,endTime);
-            }
-
-            checkResponseCode( HttpURLConnection.HTTP_OK, response);
-
-        } catch ( IOException ex ) {
-            error("While contacting server: " + ex);
-            return;
-        }
-
-        System.out.println(response.getContent());
 
         System.exit(0);
     }
@@ -249,8 +226,12 @@ public class Project4 {
 
     /** -----EXECUTE COMMANDS THAT EXIST-----
      * @throws Exception if something bad occurs
+     * @TODO ask Whitlock what to do if they supply hostname and port number, but no phonebill or other command arguments
      */
-    private static void executeCommands(){//NEED TO CHECK ALL THE COMMANDS WITH A SECOND ARG IF IT CONTAINS -SOMETHING ITS BAD
+    private static void executeCommands(){
+        PhoneBillRestClient client; //Client for all the HTTP commands
+        HttpRequestHelper.Response response; //Response from client command
+
         boolean printFlag   = false;
         boolean textFileFlag= false;
         boolean ReadmeFlag  = false;
@@ -318,21 +299,35 @@ public class Project4 {
                     client = new PhoneBillRestClient(hostName,portNumber);
                 }
             }
-            if(search == true){
-                //check that either MySearchBill is != null || MyPhoneBill!= null
-                if(MySearchBill != null){
-                    //do a GET with mysearchbill
+            //Web app stuff, this is where it all happens
+            try {
+                if (search == true) {
+                    //check that either MySearchBill is != null || MyPhoneBill!= null
+                    if (MySearchBill != null) {
+                        //do a GET with mysearchbill
+                        response = client.getValues(MySearchBill);
+                    } else if (MyPhoneBill != null) {
+                        //do a GET with myphonebill
+                        response = client.getValues(MyPhoneBill);
+                    } else {
+                        throw new Exception("No data to search for");
+                    }
+                } else if (MyPhoneBill != null) {
+                    //do a POST of MyPhoneBill and update MyPhoneBill if any extra phone calls were on the server.
+                    response = client.addKeyValuePair(MyPhoneBill);
+                } else {
+                    //They supplied no commands, check the server and getAllKeysAndValues???????
+
+                    response = client.getAllKeysAndValues();
                 }
-                else if(MyPhoneBill != null){
-                    //do a GET with myphonebill
-                }
-                else{
-                    throw new Exception("No data to search for");
-                }
+                checkResponseCode(HttpURLConnection.HTTP_OK, response);
             }
-            else if(MyPhoneBill != null){
-                //do a POST of MyPhoneBill and update MyPhoneBill if any extra phone calls were on the server.
+            catch ( IOException ex ) {
+                error("While contacting server: " + ex);
+                return;
             }
+
+            System.out.println(response.getContent());
 
             if(textFileFlag && pretty){
                 //check to make sure they don't have the same fileName
@@ -402,7 +397,6 @@ public class Project4 {
         commands = null;
         MyPhoneBill = null;
         MySearchBill = null;
-        client = null;
     }
 
     /**
