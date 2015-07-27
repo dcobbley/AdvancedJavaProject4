@@ -5,6 +5,7 @@ import edu.pdx.cs410J.web.HttpRequestHelper;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 
 /**
  * The main class that parses the command line and communicates with the
@@ -13,62 +14,32 @@ import java.net.HttpURLConnection;
 public class Project4 {
 
     public static final String MISSING_ARGS = "Missing command line arguments";
+    static ArrayList<String> commands; //used to keep track of all the commands that will be run at the end of the program
+    static phonebill MyPhoneBill;//keep a local copy of the customer to be added
+    static phonebill MySearchBill;//keep a local copy of the customer that we are looking for, only used for -search command
+    static PhoneBillRestClient client;
 
     public static void main(String... args) {
-        String hostName = null;
-        String portString = null;
-        String key = null;
-        String value = null;
+        setGlobalsToNull();
+        int element = parseCommandsAtBeginning(args);
+        parseCustomerIfExists(args, element);
+        executeCommands();
 
-        for (String arg : args) {
-            if (hostName == null) {
-                hostName = arg;
 
-            } else if ( portString == null) {
-                portString = arg;
-
-            } else if (key == null) {
-                key = arg;
-
-            } else if (value == null) {
-                value = arg;
-
-            } else {
-                usage("Extraneous command line argument: " + arg);
-            }
-        }
-
-        if (hostName == null) {
-            usage( MISSING_ARGS );
-
-        } else if ( portString == null) {
-            usage( "Missing port" );
-        }
-
-        int port;
-        try {
-            port = Integer.parseInt( portString );
-            
-        } catch (NumberFormatException ex) {
-            usage("Port \"" + portString + "\" must be an integer");
-            return;
-        }
-
-        PhoneBillRestClient client = new PhoneBillRestClient(hostName, port);
 
         HttpRequestHelper.Response response;
         try {
-            if (key == null) {
+            if (customer == null) {
                 // Print all key/value pairs
                 response = client.getAllKeysAndValues();
 
-            } else if (value == null) {
+            } else if (caller == null) {
                 // Print all values of key
-                response = client.getValues(key);
+                response = client.getValues(customer,startTime,endTime);
 
             } else {
                 // Post the key/value pair
-                response = client.addKeyValuePair(key, value);
+                response = client.addKeyValuePair(customer, caller, callee, startTime,endTime);
             }
 
             checkResponseCode( HttpURLConnection.HTTP_OK, response);
@@ -104,7 +75,307 @@ public class Project4 {
         System.exit(1);
     }
 
-    /**
+
+    /** -----PARSE COMMANDS AT BEGINNING-----
+     *
+     * @param args
+     * @throws
+     */
+    private static int parseCommandsAtBeginning(String[] args){
+        int element = 0;
+        try {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("Cannot have zero arguments");
+            }
+
+            boolean flag = false;
+            for (;element < args.length; element++) {
+                //check if -print, -README, -textFile filename
+
+                switch (args[element]) {
+                    case "-README":
+                        //add readme to the command list
+                        addArgumentCommand("-README");
+                        break;
+                    case "-print":
+                        //add print to the list
+                        addArgumentCommand("-print");
+                        break;
+                    case "-textFile":
+                        //check for ++element
+                        if (args.length > element + 1) {
+                            //save -textfile Filename
+                            addArgumentCommand("-textFile");
+                            addArgumentCommand(args[++element]);
+                        } else {
+                            //throw error
+                            throw new IllegalArgumentException("-textFile argument must be followed by <filename>");
+                        }
+                        break;
+                    case "-pretty":
+                        //check for ++element
+                        if (args.length > element + 1) {
+                            //save -textfile Filename
+                            addArgumentCommand("-pretty");
+                            addArgumentCommand(args[++element]);
+                        } else {
+                            //throw error
+                            throw new IllegalArgumentException("-pretty argument must be followed by <filename>");
+                        }
+                        break;
+                    case "host":
+                        //check for ++element
+                        if (args.length > element + 1) {
+                            //save -textfile Filename
+                            addArgumentCommand("-host");
+                            if(!dashExists(args[element+1]))
+                                addArgumentCommand(args[++element]);
+                            else
+                                throw new IllegalArgumentException("-host must contains a valid <hostname>. No dashes allowed");
+                        } else {
+                            //throw error
+                            throw new IllegalArgumentException("-host argument must be followed by <hostname>");
+                        }
+                        break;
+                    case "port":
+                        //check for ++element
+                        if (args.length > element + 1) {
+                            //save -textfile Filename
+                            addArgumentCommand("-port");
+                            if(!dashExists(args[element+1]))
+                                addArgumentCommand(args[++element]);
+                            else
+                                throw new IllegalArgumentException("-port must contains a valid <port>. No dashes allowed");
+                        } else {
+                            //throw error
+                            throw new IllegalArgumentException("-port argument must be followed by <port>");
+                        }
+                        break;
+                    case "-search":
+                        //add print to the list
+                        addArgumentCommand("-search");
+                        break;
+                    default:
+                        if(dashExists(args[element]))
+                        {
+                            throw new IllegalArgumentException("Non-Valid Argument");
+                        }
+                        return element;
+                }
+            }
+        }
+        catch(IllegalArgumentException ex){
+            if(ex.getMessage()!= null)
+                usage(ex.getMessage());
+            else
+                usage("");
+            System.exit(1);
+        }
+        return element;
+    }
+    /**-----Check if a dash is in the beggning of the argument-----
+     *
+     */
+    private static boolean dashExists(String arg){
+        //Check if a dash exists in the arg
+        return arg.startsWith("-");
+    }
+
+    /** -----PARSE CUSTOMER IF THEY EXIST-----
+     *
+     * @param args
+     * @param element
+     * @throws IllegalArgumentException if not enough args are provided
+     */
+    private static void parseCustomerIfExists(String[] args, int element){
+
+        //collect all customer data and phone call data.
+        //Try to use only locals as much as possible
+
+        try {
+            //check that element to element+8 exists
+            if (args.length > element + 8) {
+                if(args.length>element+8)
+                    System.out.println("There are extra commands not getting parsed");
+
+                //parse out customer information
+                MyPhoneBill = new phonebill(args[element++], new phonecall(args[element++], args[element++], args[element++] + " " + args[element++]+ " "+ args[element++], args[element++] + " " + args[element++]+ " " + args[element++]));
+                //                              customer                       caller            callee        starttime         +         date         +       am/pm         endtime           +         date        +         am:pm
+            } else {
+                if (args.length > element) {
+                    if(args.length>element+6)
+                        parseSearch(args,element);
+                    else {
+                        //didn't provide enough args
+                        //throw error
+                        throw new IllegalArgumentException("Not enough arguments provided");
+                    }
+                }
+            }
+        }
+        catch(IllegalArgumentException ex){
+            System.out.println(ex.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**-----Check if enough args exist to be a customer used for searching only, not creating a new one-----
+     *
+     */
+    private static void parseSearch(String[] args, int element){
+        try{
+            phonecall tempPhoneCall = new phonecall();
+            tempPhoneCall.setDate(args[element++] + " " + args[element++]+ " "+ args[element++],args[element++] + " " + args[element++]+ " "+ args[element++]);
+            MySearchBill = new phonebill(args[element++], tempPhoneCall);
+        }
+        catch(IllegalArgumentException ex){
+            if(ex.getMessage()!= null)
+                usage(ex.getMessage());
+        }
+    }
+
+    /** -----ADD AN ARGUMENT TO THE LIST-----
+     *
+     * @param arg is a single string to be added to the list of commands
+     */
+    private static void addArgumentCommand(String arg){
+        //Modify the list array of commands.
+        //This list of commands ie -README, -print, -textFile will get executed after any other work is done.
+        if(!commands.contains(arg)){
+            //Check if the list already contains it
+            commands.add(arg);
+        }
+    }
+
+    /** -----EXECUTE COMMANDS THAT EXIST-----
+     * @throws Exception if something bad occurs
+     */
+    private static void executeCommands(){//NEED TO CHECK ALL THE COMMANDS WITH A SECOND ARG IF IT CONTAINS -SOMETHING ITS BAD
+        boolean printFlag   = false;
+        boolean textFileFlag= false;
+        boolean ReadmeFlag  = false;
+        boolean pretty      = false;
+        boolean host        = false;
+        boolean port        = false;
+        boolean search      = false;
+        String fileName     = null;
+        String prettyName   = null;
+        String hostName     = null;
+        int portNumber      = 0;
+
+
+        try {
+            for (String comm : commands) {
+                switch(comm){
+                    case "-textFile":
+                        textFileFlag=true;
+                        fileName = commands.get(commands.indexOf(comm)+1);
+                        break;
+                    case "-README":
+                        ReadmeFlag = true;
+                        break;
+                    case "-print":
+                        printFlag = true;
+                        break;
+                    case "-pretty":
+                        pretty = true;
+                        prettyName = commands.get(commands.indexOf(comm)+1);
+                        break;
+                    case "-host":
+                        host= true;
+                        hostName = commands.get(commands.indexOf(comm)+1);
+                        break;
+                    case "-port":
+                        port = true;
+                        try {
+                            portNumber = Integer.parseInt(commands.get(commands.indexOf(comm)+1));
+
+                        } catch (NumberFormatException ex) {
+                            usage("Port \"" + commands.get(commands.indexOf(comm)+1) + "\" must be an integer");
+                            return;
+                        }
+                        break;
+                    case "-search":
+                        search = true;
+                    default:
+                        //fileName = comm;
+                        break;
+
+                }
+            }
+            if(host == false){
+                //throw new exception
+                throw new Exception("No host to connect to");
+            }
+            else{
+                //execute host stuff
+                if(port == false){
+                    //get mad
+                    throw new Exception("No port to connect through");
+                }
+                else{
+                    //be happy, do all the connection things here
+                    client = new PhoneBillRestClient(hostName,portNumber);
+                }
+            }
+            if(search == true){
+                //check that either MySearchBill is != null || MyPhoneBill!= null
+                if(MySearchBill != null){
+                    //do a GET with mysearchbill
+                }
+                else if(MyPhoneBill != null){
+                    //do a GET with myphonebill
+                }
+                else{
+                    throw new Exception("No data to search for");
+                }
+            }
+            else if(MyPhoneBill != null){
+                //do a POST of MyPhoneBill and update MyPhoneBill if any extra phone calls were on the server.
+            }
+
+            if(textFileFlag && pretty){
+                //check to make sure they don't have the same fileName
+                if(fileName.equals(prettyName)){
+                    throw new Exception("textFile name and pretty name cannot be the same");
+                }
+            }
+            if(textFileFlag){
+                //textFileFunction(fileName);
+                throw new Exception("Command \"-textFile\" is not supported in the current program");
+            }
+            if(printFlag){
+                if (MyPhoneBill != null) {
+                    System.out.println("Customer: " + MyPhoneBill.getCustomer() + " " + MyPhoneBill.getPhoneCalls());
+                    printFlag = true;
+                } else {
+                    //MyphoneBill is null, throw exception
+                    throw new Exception("Must provide a phone bill with the -print command");
+                }
+            }
+            if(ReadmeFlag){
+                Readme();
+            }
+            if(pretty){
+                throw new Exception("Command \"-pretty\" is not supported in the current program");
+                //prettyPrintFunction(prettyName);
+            }
+        }
+        catch(Exception ex)
+        {
+            if(ex.getMessage()!=null) {
+                usage(ex.getMessage());
+            }
+            else{
+                usage("Empty Exception");
+            }
+
+            System.exit(1);
+        }
+    }
+
+
+    /**-----README FUNCTION WITH ERRORS-----
      * Prints usage information for this program and exits
      * @param message An error message to print
      */
@@ -125,5 +396,36 @@ public class Project4 {
         err.println();
 
         System.exit(1);
+    }
+
+    public static void setGlobalsToNull(){
+        commands = null;
+        MyPhoneBill = null;
+        MySearchBill = null;
+        client = null;
+    }
+
+    /**
+     * Readme function contains the readme of all useful information the user may need to know.
+     */
+    private static void Readme() {
+        System.out.println("README has been called");
+        System.out.println("This program is a phonebill application which takes a very specific amount of arguments");
+        System.out.println("You must provide a customer name, caller number, callee number, start time, and end time (mm/dd/yyyy mm:hh)");
+        System.out.println();
+        System.out.println("usage: java edu.pdx.cs410J.<login-id>.Project4 [options] <args>\n" +
+                "args are (in this order):\n" +
+                "customer Person whose phone bill we’re modeling\n" +
+                "callerNumber Phone number of caller\n" +
+                "calleeNumber Phone number of person who was called\n" +
+                "startTime Date and time call began\n" +
+                "endTime Date and time call ended\n" +
+                "options are (options may appear in any order):\n" +
+                "-host hostname Host computer on which the server runs\n" +
+                "-port port Port on which the server is listening\n" +
+                "-search Phone calls should be searched for\n" +
+                "-print Prints a description of the new phone call\n" +
+                "-README Prints a README for this project and exits\n" +
+                "Dates and times should be in the format: mm/dd/yyyy hh:mm am");
     }
 }

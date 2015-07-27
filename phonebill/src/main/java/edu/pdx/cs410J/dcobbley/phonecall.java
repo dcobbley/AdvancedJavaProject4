@@ -79,16 +79,8 @@ public class phonecall extends AbstractPhoneCall implements Comparable<phonecall
     }
 
     public void setDate(String start, String end){
-        //String[] startArray= start.split("[ /:]");
-        //String[] endArray=end.split("[ /:]");
-
-        //this.startTime = new Date(Integer.parseInt(startArray[2])-1900, (Integer.parseInt(startArray[0]))-1, Integer.parseInt(startArray[1]),Integer.parseInt(startArray[3]),Integer.parseInt(startArray[4]),0);
-        //this.endTime = new Date(Integer.parseInt(endArray[2])-1900, (Integer.parseInt(endArray[0]))-1, Integer.parseInt(endArray[1]),Integer.parseInt(endArray[3]),Integer.parseInt(endArray[4]),0);
         try {
 
-            /*System.out.println("Date formatting stuff");
-            System.out.println("old "+ this.startTime.getTime());
-            System.out.println(ShortDateFormat.parse(start));*/
             this.startTime=ShortDateFormat.parse(start);
             this.endTime = ShortDateFormat.parse(end);
         }
@@ -97,6 +89,7 @@ public class phonecall extends AbstractPhoneCall implements Comparable<phonecall
             System.exit(1);
         }
     }
+
     /**
      *
      * @return Returns callerNumber - Getter function

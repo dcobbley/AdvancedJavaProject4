@@ -18,6 +18,7 @@ public class PhoneBillServlet extends HttpServlet
 {
     //private final Map<String, String> data = new HashMap<>();
     private final Map<String, phonebill> data = new HashMap<String, phonebill>();
+    private phonebill phoneBill = null;
 
     /**
      * Handles an HTTP GET request from a client by writing the value of the key
@@ -39,6 +40,7 @@ public class PhoneBillServlet extends HttpServlet
 
         if(customer != null && startTime != null && endTime != null){
             //client is performing a search
+
         }
         if(customer != null && startTime == null && endTime == null){
             //Client is trying writevalue
@@ -67,24 +69,47 @@ public class PhoneBillServlet extends HttpServlet
         response.setContentType( "text/plain" );
 
 
-
-
-        String key = getParameter( "key", request );
-        if (key == null) {
-            missingRequiredParameter( response, "key" );
+        String customer = getParameter( "customer", request );
+        if (customer == null) {
+            missingRequiredParameter( response, "customer" );
+            return;
+        }
+        String caller = getParameter( "caller", request );
+        if (caller == null) {
+            missingRequiredParameter( response, "caller" );
+            return;
+        }
+        String callee = getParameter( "callee", request );
+        if (callee == null) {
+            missingRequiredParameter( response, "callee" );
+            return;
+        }
+        String startTime = getParameter( "startTime", request );
+        if (startTime == null) {
+            missingRequiredParameter( response, "startTime" );
+            return;
+        }
+        String endTime = getParameter( "endTime", request );
+        if (endTime == null) {
+            missingRequiredParameter( response, "endTime" );
             return;
         }
 
-        String value = getParameter( "value", request );
-        if ( value == null) {
-            missingRequiredParameter( response, "value" );
-            return;
+        //Now we have all relavent information about customers and their phonecalls
+        if(data.get(customer) != null){
+            //Customer exists, just add a new phonecall
+            phoneBill.addPhoneCall(new phonecall(caller,callee,startTime,endTime));
+            data.put(customer,phoneBill);
+            System.out.println("adding new phonecall");
         }
-
-        this.data.put(key, value);
+        else{
+            //Customer doesn't exist, create a new phonebill.
+            data.put(customer,new phonebill(customer, new phonecall(caller,callee,startTime,endTime)));
+            System.out.println("new customer added");
+        }
 
         PrintWriter pw = response.getWriter();
-        pw.println(Messages.mappedKeyValue(key, value));
+        pw.println("Stuff and things in the phone bill servlet");
         pw.flush();
 
         response.setStatus( HttpServletResponse.SC_OK);
@@ -110,14 +135,18 @@ public class PhoneBillServlet extends HttpServlet
      *
      * The text of the message is formatted with {@link Messages#getMappingCount(int)}
      * and {@link Messages#formatKeyValuePair(String, String)}
+     * @TODO use the messages.java class to format properly.
+     * @TODO does this need to be pretty printing?
      */
-    private void writeValue( String key, HttpServletResponse response ) throws IOException
+    private void writeValue( String customer, HttpServletResponse response ) throws IOException
     {
-        String value = this.data.get(key);
+        //String value = this.data.get(key);
 
         PrintWriter pw = response.getWriter();
-        pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
-        pw.println(Messages.formatKeyValuePair( key, value ));
+        //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
+        //pw.println(Messages.formatKeyValuePair( key, value ));
+        pw.println("Doing stuff in the writeValue");
+        pw.println(data.get(customer).toString());
 
         pw.flush();
 
@@ -135,8 +164,8 @@ public class PhoneBillServlet extends HttpServlet
         PrintWriter pw = response.getWriter();
         pw.println(Messages.getMappingCount( data.size() ));
 
-        for (Map.Entry<String, String> entry : this.data.entrySet()) {
-            pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue()));
+        for (Map.Entry<String, phonebill> entry : this.data.entrySet()) {
+            pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue().toString()));
         }
 
         pw.flush();

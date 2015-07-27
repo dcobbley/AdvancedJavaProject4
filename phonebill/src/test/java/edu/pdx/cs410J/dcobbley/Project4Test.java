@@ -22,6 +22,7 @@ public class Project4Test extends InvokeMainTestCase {
         MainMethodResult result = invokeMain( Project4.class );
         assertThat(result.getExitCode(), equalTo(1));
         assertThat(result.getErr(), containsString(Project4.MISSING_ARGS));
+
     }
 
     @Test
@@ -67,4 +68,5 @@ public class Project4Test extends InvokeMainTestCase {
         MainMethodResult result = invokeMain(Project4.class,HOSTNAME,PORT, "stuff", "things");
         System.out.println(result.getOut());
     }
+
 }

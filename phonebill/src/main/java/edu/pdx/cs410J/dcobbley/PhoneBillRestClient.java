@@ -12,7 +12,7 @@ import java.io.IOException;
 public class PhoneBillRestClient extends HttpRequestHelper
 {
     private static final String WEB_APP = "phonebill";
-    private static final String SERVLET = "phonecalls";
+    private static final String SERVLET = "calls";
 
     private final String url;
 
