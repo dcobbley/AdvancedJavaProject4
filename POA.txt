@@ -1,0 +1,14 @@
+Project 4 POA,
+David Cobbley
+
+For project 4, the most difficult part will be understanding the code that already exists in the project.
+Once I am able to see how to post and getPost work, i feel it will be a simple matter of adding in code for a phonebill and phonecalls
+
+My servlet will hold a hash map of phonebills which the REST client will populate with customers and phonecalls.
+The data will only stay persistent as long as the server is running. The main functionality I need to have is adding a new phonebill by customer name and populating it with phone calls,
+and being able to search for a phone bill and return the phone calls between a specific time.
+
+All the functionality for formatting and error checking already exists in my phonecall and phonebill class which I will import from project three.
+The basic argument parsing is already done for me in the given code, I will just need to check for erroneous data and throw exceptions where appropriate.
+
+This will be a very interesting project as I have no prior experience with http web programming. 
