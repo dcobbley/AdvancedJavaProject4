@@ -12,7 +12,7 @@ import java.io.IOException;
 public class PhoneBillRestClient extends HttpRequestHelper
 {
     private static final String WEB_APP = "phonebill";
-    private static final String SERVLET = "calls";
+    private static final String SERVLET = "phonecalls";
 
     private final String url;
 
@@ -38,13 +38,13 @@ public class PhoneBillRestClient extends HttpRequestHelper
     /**
      * Returns all values for the given key
      */
-    public Response getValues( String key ) throws IOException
+    public Response getValues( String customer, String startTime, String endTime ) throws IOException
     {
-        return get(this.url, "key", key);
+        return get(this.url, "customer", customer, "startTime", startTime, "endTime", endTime);
     }
 
-    public Response addKeyValuePair( String key, String value ) throws IOException
+    public Response addKeyValuePair( String customer, String caller, String callee, String startTime, String endTime ) throws IOException
     {
-        return post( this.url, "key", key, "value", value );
+        return post( this.url, "customer", customer,"caller", caller, "callee", callee, "startTime", startTime, "endTime", endTime );
     }
 }

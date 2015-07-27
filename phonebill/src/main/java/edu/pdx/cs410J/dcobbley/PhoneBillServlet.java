@@ -30,14 +30,30 @@ public class PhoneBillServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
-        
-        String key = getParameter( "key", request );
-        if (key != null) {
+
+        String customer = getParameter( "customer", request );
+        String startTime = getParameter( "startTime", request );
+        String endTime = getParameter( "endTime", request );
+
+        //check to see if the date.customer == null
+
+        if(customer != null && startTime != null && endTime != null){
+            //client is performing a search
+        }
+        if(customer != null && startTime == null && endTime == null){
+            //Client is trying writevalue
+            writeValue(customer,response);
+        }
+        else{
+            writeAllMappings(response);
+        }
+//what about writeallmappings
+        /*if (key != null) {
             writeValue(key, response);
 
         } else {
             writeAllMappings(response);
-        }
+        }*/
     }
 
     /**
@@ -49,6 +65,9 @@ public class PhoneBillServlet extends HttpServlet
     protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
         response.setContentType( "text/plain" );
+
+
+
 
         String key = getParameter( "key", request );
         if (key == null) {
