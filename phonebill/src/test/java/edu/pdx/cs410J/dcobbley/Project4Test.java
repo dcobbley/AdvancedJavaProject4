@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class Project4Test extends InvokeMainTestCase {
     private static final String HOSTNAME = "localhost";
     private static final String PORT = System.getProperty("http.port", "8080");
+    private static final String[] SampleData = {"-host" ,HOSTNAME,"-port", PORT ,"David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
 
     @Test
     public void test1NoCommandLineArguments() {
@@ -27,20 +28,21 @@ public class Project4Test extends InvokeMainTestCase {
 
     @Test
     public void test2EmptyServer() {
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT );
+        MainMethodResult result = invokeMain( Project4.class,"-host" ,HOSTNAME,"-port", PORT );
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(0)));
+        //disp(result.getErr(), result.getOut(), result.getExitCode());
     }
 
     @Test
     public void test3NoValues() {
-        String key = "KEY";
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key );
+        MainMethodResult result = invokeMain( Project4.class, SampleData);
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(0)));
-        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
+        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
+        //disp(result.getErr(),result.getOut(), result.getExitCode());
     }
 
     @Test
@@ -62,11 +64,24 @@ public class Project4Test extends InvokeMainTestCase {
         out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(1)));
         assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
+        //disp(result.getErr(),result.getOut(), result.getExitCode());
     }
     @Test
     public void Testy(){
         MainMethodResult result = invokeMain(Project4.class,HOSTNAME,PORT, "stuff", "things");
         System.out.println(result.getOut());
+    }
+
+    private void disp(String error, String toDisplay,int code ){
+        System.out.println("******************************");
+        System.out.println();
+        System.out.println("Code: "+code);
+        System.out.println("-----");
+        System.out.println(toDisplay);
+        System.out.println("-----");
+        System.out.println("Error: "+error);
+        System.out.println();
+        System.out.println("******************************");
     }
 
 }

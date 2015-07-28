@@ -45,22 +45,11 @@ public class PhoneBillRestClient extends HttpRequestHelper
             //Search was properly handled.
             if (bill.searchCallOnly != null)
                 return get(this.url, "customer", bill.getCustomer(), "startTime", bill.searchCallOnly.getStartTimeString(), "endTime", bill.searchCallOnly.getEndTimeString());
-            else {//need to look inside of bill, may contain a list of phonecalls
-                if (bill.getPhoneCalls().size() > 1)
+            else {//need to look inside of bill for single regular phonecall
+                if (bill.phoneCalls != null)
                     throw new Exception("Please specify search parameters");
-
                 else{
-                    Collection<phonecall> tempPhoneCalls = bill.getPhoneCalls();
-                    phonecall tempCall=null;
-                    boolean flag = false;
-                    for(phonecall call: tempPhoneCalls){
-                        if(flag)
-                            throw new Exception("Please provide one set of data to search for");
-
-                        flag=true;
-                        tempCall=call;
-                    }
-                    return get(this.url, "customer", bill.getCustomer(), "startTime", tempCall.getStartTimeString(), "endTime", tempCall.getEndTimeString());
+                    return get(this.url, "customer", bill.getCustomer(), "startTime", bill.singlePhoneCall.getStartTimeString(), "endTime", bill.singlePhoneCall.getEndTimeString());
                 }
             }
         }
@@ -71,10 +60,8 @@ public class PhoneBillRestClient extends HttpRequestHelper
         }
     }
 
-    public Response addKeyValuePair( phonebill bill ) throws IOException
+    public Response addKeyValuePair(String customer, phonecall call) throws IOException
     {
-        //return post( this.url, "customer", customer,"caller", caller, "callee", callee, "startTime", startTime, "endTime", endTime );
-
-        return null;
+        return post( this.url, "customer", customer,"caller", call.callerNumber, "callee", call.calleeNumber, "startTime", call.getStartTimeString(), "endTime", call.getEndTimeString() );
     }
 }

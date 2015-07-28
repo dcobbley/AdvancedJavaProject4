@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * The main class that parses the command line and communicates with the
@@ -15,18 +17,15 @@ public class Project4 {
 
     public static final String MISSING_ARGS = "Missing command line arguments";
     static ArrayList<String> commands; //used to keep track of all the commands that will be run at the end of the program
-    static phonebill MyPhoneBill;//keep a local copy of the customer to be added
     static phonebill MySearchBill;//keep a local copy of the customer that we are looking for, only used for -search command
+    static phonebill MySingleBill;
 
     public static void main(String... args) {
         setGlobalsToNull();
+        commands=new ArrayList<String>();
         int element = parseCommandsAtBeginning(args);
         parseCustomerIfExists(args, element);
         executeCommands();
-
-
-
-
 
         System.exit(0);
     }
@@ -62,7 +61,7 @@ public class Project4 {
         int element = 0;
         try {
             if (args.length == 0) {
-                throw new IllegalArgumentException("Cannot have zero arguments");
+                throw new IllegalArgumentException(MISSING_ARGS);
             }
 
             boolean flag = false;
@@ -100,7 +99,7 @@ public class Project4 {
                             throw new IllegalArgumentException("-pretty argument must be followed by <filename>");
                         }
                         break;
-                    case "host":
+                    case "-host":
                         //check for ++element
                         if (args.length > element + 1) {
                             //save -textfile Filename
@@ -114,7 +113,7 @@ public class Project4 {
                             throw new IllegalArgumentException("-host argument must be followed by <hostname>");
                         }
                         break;
-                    case "port":
+                    case "-port":
                         //check for ++element
                         if (args.length > element + 1) {
                             //save -textfile Filename
@@ -176,7 +175,7 @@ public class Project4 {
                     System.out.println("There are extra commands not getting parsed");
 
                 //parse out customer information
-                MyPhoneBill = new phonebill(args[element++], new phonecall(args[element++], args[element++], args[element++] + " " + args[element++]+ " "+ args[element++], args[element++] + " " + args[element++]+ " " + args[element++]));
+                MySingleBill = new phonebill(args[element++], new phonecall(args[element++], args[element++], args[element++] + " " + args[element++]+ " "+ args[element++], args[element++] + " " + args[element++]+ " " + args[element++]),"-single");
                 //                              customer                       caller            callee        starttime         +         date         +       am/pm         endtime           +         date        +         am:pm
             } else {
                 if (args.length > element) {
@@ -202,8 +201,9 @@ public class Project4 {
     private static void parseSearch(String[] args, int element){
         try{
             phonecall tempPhoneCall = new phonecall();
+            String customer = args[element++];
             tempPhoneCall.setDate(args[element++] + " " + args[element++]+ " "+ args[element++],args[element++] + " " + args[element++]+ " "+ args[element++]);
-            MySearchBill = new phonebill(args[element++], tempPhoneCall,"-search");
+            MySearchBill = new phonebill(customer, tempPhoneCall,"-search");
         }
         catch(IllegalArgumentException ex){
             if(ex.getMessage()!= null)
@@ -231,6 +231,7 @@ public class Project4 {
     private static void executeCommands(){
         PhoneBillRestClient client; //Client for all the HTTP commands
         HttpRequestHelper.Response response; //Response from client command
+        ArrayList<HttpRequestHelper.Response> listOfResponses; //List of Response from client command
 
         boolean printFlag   = false;
         boolean textFileFlag= false;
@@ -306,15 +307,15 @@ public class Project4 {
                     if (MySearchBill != null) {
                         //do a GET with mysearchbill
                         response = client.getValues(MySearchBill);
-                    } else if (MyPhoneBill != null) {
+                    } else if (MySingleBill != null) {
                         //do a GET with myphonebill
-                        response = client.getValues(MyPhoneBill);
+                        response = client.getValues(MySingleBill);
                     } else {
                         throw new Exception("No data to search for");
                     }
-                } else if (MyPhoneBill != null) {
+                } else if (MySingleBill!=null&&MySingleBill.singlePhoneCall != null) {
                     //do a POST of MyPhoneBill and update MyPhoneBill if any extra phone calls were on the server.
-                    response = client.addKeyValuePair(MyPhoneBill);
+                    response = client.addKeyValuePair(MySingleBill.getCustomer(),MySingleBill.singlePhoneCall);
                 } else {
                     //They supplied no commands, check the server and getAllKeysAndValues???????
 
@@ -340,8 +341,8 @@ public class Project4 {
                 throw new Exception("Command \"-textFile\" is not supported in the current program");
             }
             if(printFlag){
-                if (MyPhoneBill != null) {
-                    System.out.println("Customer: " + MyPhoneBill.getCustomer() + " " + MyPhoneBill.getPhoneCalls());
+                if (MySingleBill != null) {
+                    System.out.println("Customer: " + MySingleBill.getCustomer() + " " + MySingleBill.getPhoneCalls());
                     printFlag = true;
                 } else {
                     //MyphoneBill is null, throw exception
@@ -395,7 +396,7 @@ public class Project4 {
 
     public static void setGlobalsToNull(){
         commands = null;
-        MyPhoneBill = null;
+        MySingleBill = null;
         MySearchBill = null;
     }
 

@@ -14,6 +14,7 @@ public class phonebill extends AbstractPhoneBill{
     String customer;
     ArrayList<phonecall> phoneCalls;
     phonecall searchCallOnly;
+    phonecall singlePhoneCall;
 
     /**
      * Constructor is essentially a setter function. creates a new list which will hold all additional phonecalls.
@@ -26,12 +27,14 @@ public class phonebill extends AbstractPhoneBill{
         phoneCalls = new ArrayList<phonecall>();
         addPhoneCall(phoneCall);
         searchCallOnly=null;
+        singlePhoneCall = null;
     }
     phonebill(String customer)
     {
         this.customer = customer;
         phoneCalls = new ArrayList<phonecall>();
         searchCallOnly=null;
+        singlePhoneCall = null;
     }
     phonebill()
     {
@@ -39,6 +42,7 @@ public class phonebill extends AbstractPhoneBill{
         customer = "";
         phoneCalls = new ArrayList<phonecall>();
         searchCallOnly=null;
+        singlePhoneCall = null;
     }
 
     public phonebill(String customer, phonecall tempPhoneCall, String s) {
@@ -46,6 +50,11 @@ public class phonebill extends AbstractPhoneBill{
             this.customer = customer;
             phoneCalls = null;
             searchCallOnly = tempPhoneCall;
+        }
+        if(s.equals("-single")) {
+            this.customer = customer;
+            phoneCalls = null;
+            singlePhoneCall = tempPhoneCall;
         }
     }
 
