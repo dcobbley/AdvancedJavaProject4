@@ -171,8 +171,8 @@ public class Project4 {
         try {
             //check that element to element+8 exists
             if (args.length > element + 8) {
-                if(args.length>element+8)
-                    System.out.println("There are extra commands not getting parsed");
+                //if(args.length>element+8)
+                  //  System.out.println("There are extra commands not getting parsed");
 
                 //parse out customer information
                 MySingleBill = new phonebill(args[element++], new phonecall(args[element++], args[element++], args[element++] + " " + args[element++]+ " "+ args[element++], args[element++] + " " + args[element++]+ " " + args[element++]),"-single");

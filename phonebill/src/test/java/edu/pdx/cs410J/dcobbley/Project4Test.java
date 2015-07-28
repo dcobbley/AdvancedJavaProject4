@@ -16,7 +16,12 @@ import static org.hamcrest.Matchers.equalTo;
 public class Project4Test extends InvokeMainTestCase {
     private static final String HOSTNAME = "localhost";
     private static final String PORT = System.getProperty("http.port", "8080");
-    private static final String[] SampleData = {"-host" ,HOSTNAME,"-port", PORT ,"David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] BadPort =  {"-host" ,HOSTNAME,"-port", System.getProperty("http.port", "1234") ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerA1 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerA2 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-231-8877", "10/28/2015","6:23","am","10/28/2015", "1:50","pm"};
+    private static final String[] CustomerSearchA1 = {"-host" ,HOSTNAME,"-port", PORT ,"David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"Steph","503-111-2345","503-445-6778", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerSearchB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"Steph","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
 
     @Test
     public void test1NoCommandLineArguments() {
@@ -37,7 +42,7 @@ public class Project4Test extends InvokeMainTestCase {
 
     @Test
     public void test3NoValues() {
-        MainMethodResult result = invokeMain( Project4.class, SampleData);
+        MainMethodResult result = invokeMain( Project4.class, CustomerSearchA1);
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(0)));
@@ -47,14 +52,12 @@ public class Project4Test extends InvokeMainTestCase {
 
     @Test
     public void test4AddValue() {
-        String key = "KEY";
-        String value = "VALUE";
 
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key, value );
+        MainMethodResult result = invokeMain( Project4.class, customerA1 );
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
-        assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
-
+        //assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
+/*
         result = invokeMain( Project4.class, HOSTNAME, PORT, key );
         out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(1)));
@@ -63,8 +66,8 @@ public class Project4Test extends InvokeMainTestCase {
         result = invokeMain( Project4.class, HOSTNAME, PORT );
         out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(1)));
-        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
-        //disp(result.getErr(),result.getOut(), result.getExitCode());
+        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));*/
+        disp(result.getErr(),result.getOut(), result.getExitCode());
     }
     @Test
     public void Testy(){
