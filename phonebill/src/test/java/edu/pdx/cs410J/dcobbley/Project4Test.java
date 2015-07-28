@@ -23,9 +23,10 @@ public class Project4Test extends InvokeMainTestCase {
     private static final String[] BadPort =  {"-host" ,HOSTNAME,"-port", System.getProperty("http.port", "1234") ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerA1 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerA2 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-231-8877", "10/28/2015","6:23","am","10/28/2015", "1:50","pm"};
-    private static final String[] CustomerSearchA1 = {"-host" ,HOSTNAME,"-port", PORT ,"David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] CustomerSearchA1 = {"-host" ,HOSTNAME,"-port", PORT ,"-search","David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"Steph","503-111-2345","503-445-6778", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
-    private static final String[] customerSearchB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"Steph","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerSearchB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"-search","Steph","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerSearchNoName =  {"-host" ,HOSTNAME,"-port", PORT ,"Zaphod Beeblebrox ","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
 
     @Test
     public void test1NoCommandLineArguments() {
@@ -85,11 +86,35 @@ public class Project4Test extends InvokeMainTestCase {
     @Test
     public void test5InvalidHostName() {
         MainMethodResult result = invokeMain(Project4.class, BadPort);
-        //assertThat(result.getErr(), result.getExitCode(), equalTo(1));
-        String out = result.getErr().toString();
-        assertThat(out, out, containsString(errorDisplay(errorConnecting())));
+        assertThat(result.getErr(), result.getExitCode(), equalTo(1));
+        String out = result.getErr().trim();
+        assertEquals(out, errorDisplay(errorConnecting()));
         //disp(result.getErr(), result.getOut(), result.getExitCode());
     }
+
+    @Test
+    public void test6UserDoesNotExist() {
+        MainMethodResult result = invokeMain(Project4.class, customerSearchNoName);
+        //assertThat(result.getErr(), result.getExitCode(), equalTo(1));
+        String out = result.getErr().trim();
+        //assertEquals(out, errorDisplay(errorConnecting()));
+        disp(result.getErr(), result.getOut(), result.getExitCode());
+    }
+
+    @Test
+    public void test7Search() {
+        MainMethodResult result = invokeMain( Project4.class, CustomerSearchA1);
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        String out = result.getOut();
+        //assertThat(out, out, containsString(Messages.getMappingCount(0)));
+        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
+        disp(result.getErr(),result.getOut(), result.getExitCode());
+    }
+
+
+
+
+
 
     private void disp(String error, String toDisplay,int code ){
         System.out.println("******************************");
@@ -102,6 +127,7 @@ public class Project4Test extends InvokeMainTestCase {
         System.out.println();
         System.out.println("******************************");
     }
+
     private String errorDisplay(String err){
         return err+"usage: java Project4 host port [key] [value]\n" +
                 "  host    Host of web server\n" +
@@ -113,31 +139,16 @@ public class Project4Test extends InvokeMainTestCase {
                 "If no value is specified, then all values are printed\n" +
                 "If no key is specified, all key/value pairs are printed";
     }
+
     private String errorConnecting(){
-        return "** While contacting server: Connection refused: connect,\n" +
-                "Please try again witha a valid host name\n" +
+        return "** While contacting server: Connection refused,\n" +
+                "Please try again with a a valid host name\n" +
                 "\n" +
-                "** Empty Exception\n\n";
+                "** Empty Exception\n" +
+                "\n";
     }
 
 }
 
-/*
-
-"** While contacting server: Connection refused: connect,\n" +
-                "Please try again witha a valid host name\n" +
-                "\n" +
-                "** Empty Exception\n\n" +
-                "usage: java Project4 host port [key] [value]\n" +
-                "  host    Host of web server\n" +
-                "  port    Port of web server\n" +
-                "  key     Key to query\n" +
-                "  value   Value to add to server\n" +
-                "\n" +
-                "This simple program posts key/value pairs to the server\n" +
-                "If no value is specified, then all values are printed\n" +
-                "If no key is specified, all key/value pairs are printed"
-
- */
 
 

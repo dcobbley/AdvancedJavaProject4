@@ -305,7 +305,7 @@ public class Project4 {
                 checkResponseCode(HttpURLConnection.HTTP_OK, response);
             }
             catch ( IOException ex ) {
-                error("While contacting server: " + ex.getMessage()+",\nPlease try again witha a valid host name\n");
+                error("While contacting server: " + ex.getMessage()+",\nPlease try again with a a valid host name\n");
                 return;
             }
 

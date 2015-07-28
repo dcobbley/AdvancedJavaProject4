@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,11 +38,15 @@ public class PhoneBillServlet extends HttpServlet
         String startTime = getParameter( "startTime", request );
         String endTime = getParameter( "endTime", request );
 
+
         //check to see if the date.customer == null
 
         if(customer != null && startTime != null && endTime != null){
+            phonecall tempPhonecall = new phonecall();
+            tempPhonecall.setDate(startTime,endTime);
             //client is performing a search
-
+            //return all phonecalls that begin between the start and end time
+            writeSearchValue(new phonebill(customer,tempPhonecall,"-search"),response);
         }
         if(customer != null && startTime == null && endTime == null){
             //Client is trying writevalue
@@ -149,14 +155,53 @@ public class PhoneBillServlet extends HttpServlet
         PrintWriter pw = response.getWriter();
         //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
         //pw.println(Messages.formatKeyValuePair( key, value ));
-        pw.println("WriteValue function to be displayed on server page");
-        pw.println(data.get(customer).toString());
+        //pw.println("WriteValue function to be displayed on server page");
+        if(data.get(customer)!= null)
+            pw.println(data.get(customer).toString());
+        else
+            pw.println("Customer does not exists");
 
         pw.flush();
 
         response.setStatus( HttpServletResponse.SC_OK );
     }
 
+    /**
+     *
+     */
+    private void writeSearchValue( phonebill bill, HttpServletResponse response ) throws IOException
+    {
+        //String value = this.data.get(key);
+
+        PrintWriter pw = response.getWriter();
+        //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
+        //pw.println(Messages.formatKeyValuePair( key, value ));
+        //pw.println("WriteValue function to be displayed on server page");
+        String customer = bill.getCustomer();
+        Long begin = bill.searchCallOnly.startTime.getTime();
+
+        if(data.get(customer)!= null) {
+            pw.println("Searching for: " +data.get(customer).toString());
+            Collection<phonecall> phoneCalls = data.get(customer).getPhoneCalls();
+            boolean flag = true;
+            for(phonecall call: phoneCalls){
+                if(begin>= call.startTime.getTime()&&begin<=call.endTime.getTime()){
+                    flag = false;
+                    pw.println("Pretty print this "+ customer+" "+ call.toString());
+                }
+            }
+            if(flag){
+                //No phone calls match your request
+                pw.println("No phonecalls match for: "+customer);
+            }
+        }
+        else
+            pw.println("Customer does not exists");
+
+        pw.flush();
+
+        response.setStatus( HttpServletResponse.SC_OK );
+    }
     /**
      * Writes all of the key/value pairs to the HTTP response.
      *
