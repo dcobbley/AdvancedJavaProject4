@@ -30,26 +30,7 @@ public class Project4 {
         System.exit(0);
     }
 
-    /**
-     * Makes sure that the give response has the expected HTTP status code
-     * @param code The expected status code
-     * @param response The response from the server
-     */
-    private static void checkResponseCode( int code, HttpRequestHelper.Response response )
-    {
-        if (response.getCode() != code) {
-            error(String.format("Expected HTTP code %d, got code %d.\n\n%s", code,
-                                response.getCode(), response.getContent()));
-        }
-    }
 
-    private static void error( String message )
-    {
-        PrintStream err = System.err;
-        err.println("** " + message);
-
-        System.exit(1);
-    }
 
 
     /** -----PARSE COMMANDS AT BEGINNING-----
@@ -324,7 +305,7 @@ public class Project4 {
                 checkResponseCode(HttpURLConnection.HTTP_OK, response);
             }
             catch ( IOException ex ) {
-                error("While contacting server: " + ex);
+                error("While contacting server: " + ex.getMessage()+",\nPlease try again witha a valid host name\n");
                 return;
             }
 
@@ -370,6 +351,26 @@ public class Project4 {
         }
     }
 
+    /**
+     * Makes sure that the give response has the expected HTTP status code
+     * @param code The expected status code
+     * @param response The response from the server
+     */
+    private static void checkResponseCode( int code, HttpRequestHelper.Response response )
+    {
+        if (response.getCode() != code) {
+            error(String.format("Expected HTTP code %d, got code %d.\n\n%s", code,
+                    response.getCode(), response.getContent()));
+        }
+    }
+
+    private static void error( String message )
+    {
+        PrintStream err = System.err;
+        err.println("** " + message);
+
+        System.exit(1);
+    }
 
     /**-----README FUNCTION WITH ERRORS-----
      * Prints usage information for this program and exits

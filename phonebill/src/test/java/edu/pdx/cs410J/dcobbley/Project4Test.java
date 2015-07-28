@@ -5,6 +5,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,7 +37,7 @@ public class Project4Test extends InvokeMainTestCase {
 
     @Test
     public void test2EmptyServer() {
-        MainMethodResult result = invokeMain( Project4.class,"-host" ,HOSTNAME,"-port", PORT );
+        MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "-port", PORT);
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
         assertThat(out, out, containsString(Messages.getMappingCount(0)));
@@ -53,28 +57,38 @@ public class Project4Test extends InvokeMainTestCase {
     @Test
     public void test4AddValue() {
 
-        MainMethodResult result = invokeMain( Project4.class, customerA1 );
+        MainMethodResult result = invokeMain(Project4.class, customerA1);
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
-        //assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
-        disp(result.getErr(),result.getOut(), result.getExitCode());
+        assertThat(out, out, containsString("attempting to add a new customer"));
+        //disp(result.getErr(), result.getOut(), result.getExitCode());
 
         result = invokeMain( Project4.class, customerA1);
         out = result.getOut();
-        //assertThat(out, out, containsString(Messages.getMappingCount(1)));
-        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
-        disp(result.getErr(),result.getOut(), result.getExitCode());
+        assertThat(out, out, containsString("attempting to add a new phonecall to existing customer"));
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        //disp(result.getErr(),result.getOut(), result.getExitCode());
 
         result = invokeMain( Project4.class, customerB1);
         out = result.getOut();
-        //assertThat(out, out, containsString(Messages.getMappingCount(1)));
-        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
-        disp(result.getErr(),result.getOut(), result.getExitCode());
+        assertThat(out, out, containsString("attempting to add a new customer"));
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        //disp(result.getErr(), result.getOut(), result.getExitCode());
+
+        result = invokeMain( Project4.class, customerA2);
+        out = result.getOut();
+        assertThat(out, out, containsString("attempting to add a new phonecall to existing customer"));
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        //disp(result.getErr(),result.getOut(), result.getExitCode());
     }
+
     @Test
-    public void Testy(){
-        MainMethodResult result = invokeMain(Project4.class,HOSTNAME,PORT, "stuff", "things");
-        System.out.println(result.getOut());
+    public void test5InvalidHostName() {
+        MainMethodResult result = invokeMain(Project4.class, BadPort);
+        //assertThat(result.getErr(), result.getExitCode(), equalTo(1));
+        String out = result.getErr().toString();
+        assertThat(out, out, containsString(errorDisplay(errorConnecting())));
+        //disp(result.getErr(), result.getOut(), result.getExitCode());
     }
 
     private void disp(String error, String toDisplay,int code ){
@@ -84,9 +98,46 @@ public class Project4Test extends InvokeMainTestCase {
         System.out.println("-----");
         System.out.println(toDisplay);
         System.out.println("-----");
-        System.out.println("Error: "+error);
+        System.out.println("Error: " + error);
         System.out.println();
         System.out.println("******************************");
     }
+    private String errorDisplay(String err){
+        return err+"usage: java Project4 host port [key] [value]\n" +
+                "  host    Host of web server\n" +
+                "  port    Port of web server\n" +
+                "  key     Key to query\n" +
+                "  value   Value to add to server\n" +
+                "\n" +
+                "This simple program posts key/value pairs to the server\n" +
+                "If no value is specified, then all values are printed\n" +
+                "If no key is specified, all key/value pairs are printed";
+    }
+    private String errorConnecting(){
+        return "** While contacting server: Connection refused: connect,\n" +
+                "Please try again witha a valid host name\n" +
+                "\n" +
+                "** Empty Exception\n\n";
+    }
 
 }
+
+/*
+
+"** While contacting server: Connection refused: connect,\n" +
+                "Please try again witha a valid host name\n" +
+                "\n" +
+                "** Empty Exception\n\n" +
+                "usage: java Project4 host port [key] [value]\n" +
+                "  host    Host of web server\n" +
+                "  port    Port of web server\n" +
+                "  key     Key to query\n" +
+                "  value   Value to add to server\n" +
+                "\n" +
+                "This simple program posts key/value pairs to the server\n" +
+                "If no value is specified, then all values are printed\n" +
+                "If no key is specified, all key/value pairs are printed"
+
+ */
+
+
