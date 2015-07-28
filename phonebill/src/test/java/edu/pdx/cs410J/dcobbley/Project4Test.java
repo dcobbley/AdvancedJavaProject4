@@ -57,16 +57,18 @@ public class Project4Test extends InvokeMainTestCase {
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
         //assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
-/*
-        result = invokeMain( Project4.class, HOSTNAME, PORT, key );
-        out = result.getOut();
-        assertThat(out, out, containsString(Messages.getMappingCount(1)));
-        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
+        disp(result.getErr(),result.getOut(), result.getExitCode());
 
-        result = invokeMain( Project4.class, HOSTNAME, PORT );
+        result = invokeMain( Project4.class, customerA1);
         out = result.getOut();
-        assertThat(out, out, containsString(Messages.getMappingCount(1)));
-        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));*/
+        //assertThat(out, out, containsString(Messages.getMappingCount(1)));
+        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
+        disp(result.getErr(),result.getOut(), result.getExitCode());
+
+        result = invokeMain( Project4.class, customerB1);
+        out = result.getOut();
+        //assertThat(out, out, containsString(Messages.getMappingCount(1)));
+        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
         disp(result.getErr(),result.getOut(), result.getExitCode());
     }
     @Test

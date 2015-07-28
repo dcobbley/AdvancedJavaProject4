@@ -95,21 +95,25 @@ public class PhoneBillServlet extends HttpServlet
             return;
         }
 
+        PrintWriter pw = response.getWriter();
         //Now we have all relavent information about customers and their phonecalls
-        if(data.get(customer) != null){
+        if(data!=null &&data.get(customer) != null){
             //Customer exists, just add a new phonecall
-            phoneBill.addPhoneCall(new phonecall(caller,callee,startTime,endTime));
-            data.put(customer,phoneBill);
+            phoneBill = data.get(customer);
+            phoneBill.addPhoneCall(new phonecall(caller, callee, startTime, endTime));
+            data.put(customer, phoneBill);
             System.out.println("adding new phonecall");
+            pw.println("attempting to add a new phonecall to existing customer");
+
         }
         else{
             //Customer doesn't exist, create a new phonebill.
             data.put(customer,new phonebill(customer, new phonecall(caller,callee,startTime,endTime)));
             System.out.println("new customer added");
+            pw.println("attempting to add a new customer");
+
         }
 
-        PrintWriter pw = response.getWriter();
-        pw.println("Stuff and things in the phone bill servlet");
         pw.flush();
 
         response.setStatus( HttpServletResponse.SC_OK);
@@ -145,7 +149,7 @@ public class PhoneBillServlet extends HttpServlet
         PrintWriter pw = response.getWriter();
         //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
         //pw.println(Messages.formatKeyValuePair( key, value ));
-        pw.println("Doing stuff in the writeValue");
+        pw.println("WriteValue function to be displayed on server page");
         pw.println(data.get(customer).toString());
 
         pw.flush();
