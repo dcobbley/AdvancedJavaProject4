@@ -27,6 +27,8 @@ public class PhoneBillServlet extends HttpServlet
      * specified in the "key" HTTP parameter to the HTTP response.  If the "key"
      * parameter is not specified, all of the key/value pairs are written to the
      * HTTP response.
+     * @param request is the text coming in from the url that needs to be parsed
+     * @param response url for where the response goes
      */
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -60,6 +62,8 @@ public class PhoneBillServlet extends HttpServlet
      * Handles an HTTP POST request by storing the key/value pair specified by the
      * "key" and "value" request parameters.  It writes the key/value pair to the
      * HTTP response.
+     * @param request is the text coming in from the url that needs to be parsed
+     * @param response url for where the response goes
      */
     @Override
     protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -138,6 +142,8 @@ public class PhoneBillServlet extends HttpServlet
      * Writes an error message about a missing parameter to the HTTP response.
      *
      * The text of the error message is created by {@link Messages#missingRequiredParameter(String)}
+     * @param parameterName used to write an error about bad parameters
+     * @param response url for where the response goes
      */
     private void missingRequiredParameter( HttpServletResponse response, String parameterName )
         throws IOException
@@ -156,6 +162,8 @@ public class PhoneBillServlet extends HttpServlet
      * and {@link Messages#formatKeyValuePair(String, String)}
      * @TODO use the messages.java class to format properly.
      * @TODO does this need to be pretty printing?
+     * @param customer is the name of the phonebills customer
+     * @param response url for where the response goes
      */
     private void writeValue( String customer, HttpServletResponse response ) throws IOException
     {
@@ -176,7 +184,8 @@ public class PhoneBillServlet extends HttpServlet
     }
 
     /**
-     *
+     *@param bill is the phonebill to be searched
+     * @param response url for where the response goes
      */
     private void writeSearchValue( phonebill bill, HttpServletResponse response ) throws IOException
     {
@@ -229,6 +238,7 @@ public class PhoneBillServlet extends HttpServlet
      *
      * The text of the message is formatted with
      * {@link Messages#formatKeyValuePair(String, String)}
+     * @param response url for where the response goes
      */
     private void writeAllMappings( HttpServletResponse response ) throws IOException
     {
@@ -249,6 +259,7 @@ public class PhoneBillServlet extends HttpServlet
      *
      * @return <code>null</code> if the value of the parameter is
      *         <code>null</code> or is the empty string
+     *
      */
     private String getParameter(String name, HttpServletRequest request) {
       String value = request.getParameter(name);

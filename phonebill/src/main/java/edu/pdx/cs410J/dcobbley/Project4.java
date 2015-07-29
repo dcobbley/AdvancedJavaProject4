@@ -35,8 +35,8 @@ public class Project4 {
 
     /** -----PARSE COMMANDS AT BEGINNING-----
      *
-     * @param args
-     * @throws
+     * @param args parse all of the commands from args
+     * @throws IllegalArgumentException if there are missing args
      */
     private static int parseCommandsAtBeginning(String[] args){
         int element = 0;
@@ -131,7 +131,7 @@ public class Project4 {
         return element;
     }
     /**-----Check if a dash is in the beggning of the argument-----
-     *
+     *  @return true or false if it starts with a dash
      */
     private static boolean dashExists(String arg){
         //Check if a dash exists in the arg
@@ -140,8 +140,8 @@ public class Project4 {
 
     /** -----PARSE CUSTOMER IF THEY EXIST-----
      *
-     * @param args
-     * @param element
+     * @param args more parsing and stuff
+     * @param element is a counter to keep track of which arg we are parsing
      * @throws IllegalArgumentException if not enough args are provided
      */
     private static void parseCustomerIfExists(String[] args, int element){
@@ -177,7 +177,8 @@ public class Project4 {
     }
 
     /**-----Check if enough args exist to be a customer used for searching only, not creating a new one-----
-     *
+     *@param element is a counter to keep track of which arg we are parsing
+     * @param args is the list of args passed in to parse
      */
     private static void parseSearch(String[] args, int element){
         try{
@@ -385,6 +386,10 @@ public class Project4 {
         }
     }
 
+    /**
+     *
+     * @param message is used to nicely display stuff
+     */
     private static void error( String message )
     {
         PrintStream err = System.err;
