@@ -181,10 +181,16 @@ public class Project4 {
      */
     private static void parseSearch(String[] args, int element){
         try{
-            phonecall tempPhoneCall = new phonecall();
-            String customer = args[element++];
-            tempPhoneCall.setDate(args[element++] + " " + args[element++]+ " "+ args[element++],args[element++] + " " + args[element++]+ " "+ args[element++]);
-            MySearchBill = new phonebill(customer, tempPhoneCall,"-search");
+            if(commands.contains("-search")) {
+                phonecall tempPhoneCall = new phonecall();
+                String customer = args[element++];
+                tempPhoneCall.setDate(args[element++] + " " + args[element++] + " " + args[element++], args[element++] + " " + args[element++] + " " + args[element++]);
+                MySearchBill = new phonebill(customer, tempPhoneCall, "-search");
+            }
+            else{
+                //Throw exception, trying to add a new phonecall or customer with not enough args.
+                throw new IllegalArgumentException("Not enough arguments to add customer or phonecall");
+            }
         }
         catch(IllegalArgumentException ex){
             if(ex.getMessage()!= null)

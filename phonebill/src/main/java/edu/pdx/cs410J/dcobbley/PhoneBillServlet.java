@@ -31,12 +31,18 @@ public class PhoneBillServlet extends HttpServlet
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
+        System.out.println("LOGGING: doGet was called");
         response.setContentType( "text/plain" );
 
 
         String customer = getParameter( "customer", request );
         String startTime = getParameter( "startTime", request );
         String endTime = getParameter( "endTime", request );
+
+        System.out.println(customer);
+        System.out.println(startTime);
+        System.out.println(endTime);
+        System.out.println("END");
 
 
         //check to see if the date.customer == null
@@ -48,20 +54,13 @@ public class PhoneBillServlet extends HttpServlet
             //return all phonecalls that begin between the start and end time
             writeSearchValue(new phonebill(customer,tempPhonecall,"-search"),response);
         }
-        if(customer != null && startTime == null && endTime == null){
+        else if(customer != null && startTime == null && endTime == null){
             //Client is trying writevalue
             writeValue(customer,response);
         }
         else{
             writeAllMappings(response);
         }
-//what about writeallmappings
-        /*if (key != null) {
-            writeValue(key, response);
-
-        } else {
-            writeAllMappings(response);
-        }*/
     }
 
     /**
@@ -185,7 +184,7 @@ public class PhoneBillServlet extends HttpServlet
             Collection<phonecall> phoneCalls = data.get(customer).getPhoneCalls();
             boolean flag = true;
             for(phonecall call: phoneCalls){
-                if(begin>= call.startTime.getTime()&&begin<=call.endTime.getTime()){
+                if(begin>= (Long)call.startTime.getTime()&&begin<=(Long)call.endTime.getTime()){
                     flag = false;
                     pw.println("Pretty print this "+ customer+" "+ call.toString());
                 }

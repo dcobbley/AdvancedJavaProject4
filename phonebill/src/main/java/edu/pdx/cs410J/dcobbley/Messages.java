@@ -8,12 +8,12 @@ public class Messages
 {
     public static String getMappingCount( int count )
     {
-        return String.format( "Server contains %d key/value pairs", count );
+        return String.format( "Server contains %d customer/phonebill pairs", count );
     }
 
-    public static String formatKeyValuePair( String key, String value )
+    public static String formatKeyValuePair( String customer, String bill )
     {
-        return String.format("  %s -> %s", key, value);
+        return String.format("  %s -> %s", customer, bill);
     }
 
     public static String missingRequiredParameter( String parameterName )
@@ -21,8 +21,8 @@ public class Messages
         return String.format("The required parameter \"%s\" is missing", parameterName);
     }
 
-    public static String mappedKeyValue( String key, String value )
+    public static String mappedKeyValue( String customer, String bill )
     {
-        return String.format( "Mapped %s to %s", key, value );
+        return String.format( "Mapped %s to %s", customer, bill );
     }
 }

@@ -65,7 +65,7 @@ public class phonecall extends AbstractPhoneCall implements Comparable<phonecall
     }
     phonecall(){
         //dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        ShortDateFormat = new SimpleDateFormat("hh/dd/yyy HH:mm a", Locale.ENGLISH);
+        ShortDateFormat = new SimpleDateFormat("MM/dd/yyy hh:mm a", Locale.ENGLISH);
         try {
             calleeNumber = "";
             callerNumber = "";
@@ -80,7 +80,6 @@ public class phonecall extends AbstractPhoneCall implements Comparable<phonecall
 
     public void setDate(String start, String end){
         try {
-
             this.startTime=ShortDateFormat.parse(start);
             this.endTime = ShortDateFormat.parse(end);
         }

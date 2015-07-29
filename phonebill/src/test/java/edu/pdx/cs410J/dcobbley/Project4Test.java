@@ -1,6 +1,7 @@
 package edu.pdx.cs410J.dcobbley;
 
 import edu.pdx.cs410J.InvokeMainTestCase;
+import junit.framework.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -23,10 +24,11 @@ public class Project4Test extends InvokeMainTestCase {
     private static final String[] BadPort =  {"-host" ,HOSTNAME,"-port", System.getProperty("http.port", "1234") ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerA1 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-880-6960", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerA2 =  {"-host" ,HOSTNAME,"-port", PORT ,"David","503-709-4866","503-231-8877", "10/28/2015","6:23","am","10/28/2015", "1:50","pm"};
-    private static final String[] CustomerSearchA1 = {"-host" ,HOSTNAME,"-port", PORT ,"-search","David", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] CustomerSearchA1 = {"-host" ,HOSTNAME,"-port", PORT ,"-search","David", "10/25/2015","11:35","AM","10/25/2015", "11:50","AM"};
     private static final String[] customerB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"Steph","503-111-2345","503-445-6778", "10/25/2015","11:25","am","10/25/2015", "11:50","am"};
     private static final String[] customerSearchB1 =  {"-host" ,HOSTNAME,"-port", PORT ,"-search","Steph","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
-    private static final String[] customerSearchNoName =  {"-host" ,HOSTNAME,"-port", PORT ,"Zaphod Beeblebrox ","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerSearchNoName =  {"-host" ,HOSTNAME,"-port", PORT ,"-search","Zaphod Beeblebrox ","10/25/2015","11:25","am","10/25/2015", "11:50","am"};
+    private static final String[] customerSearchWriteAll =  {"-host" ,HOSTNAME,"-port", PORT};
 
     @Test
     public void test1NoCommandLineArguments() {
@@ -50,7 +52,7 @@ public class Project4Test extends InvokeMainTestCase {
         MainMethodResult result = invokeMain( Project4.class, CustomerSearchA1);
         assertThat(result.getErr(), result.getExitCode(), equalTo(0));
         String out = result.getOut();
-        assertThat(out, out, containsString(Messages.getMappingCount(0)));
+        assertThat(out, out, containsString("Customer does not exists"));
         //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
         //disp(result.getErr(),result.getOut(), result.getExitCode());
     }
@@ -88,7 +90,7 @@ public class Project4Test extends InvokeMainTestCase {
         MainMethodResult result = invokeMain(Project4.class, BadPort);
         assertThat(result.getErr(), result.getExitCode(), equalTo(1));
         String out = result.getErr().trim();
-        assertEquals(out, errorDisplay(errorConnecting()));
+        assertThat(out, out, containsString("Please try again with a a valid host name"));
         //disp(result.getErr(), result.getOut(), result.getExitCode());
     }
 
@@ -96,9 +98,10 @@ public class Project4Test extends InvokeMainTestCase {
     public void test6UserDoesNotExist() {
         MainMethodResult result = invokeMain(Project4.class, customerSearchNoName);
         //assertThat(result.getErr(), result.getExitCode(), equalTo(1));
-        String out = result.getErr().trim();
-        //assertEquals(out, errorDisplay(errorConnecting()));
-        disp(result.getErr(), result.getOut(), result.getExitCode());
+        String out = result.getOut().trim();
+        //disp(result.getErr(), result.getOut(), result.getExitCode());
+        assertEquals(out, "Customer does not exists");
+
     }
 
     @Test
@@ -109,6 +112,16 @@ public class Project4Test extends InvokeMainTestCase {
         //assertThat(out, out, containsString(Messages.getMappingCount(0)));
         //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
         disp(result.getErr(),result.getOut(), result.getExitCode());
+    }
+
+    @Test
+    public void test8WriteAll() {
+        MainMethodResult result = invokeMain( Project4.class);
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        String out = result.getOut();
+        assertThat(out, out, containsString(Messages.getMappingCount(0)));
+        //assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
+        //disp(result.getErr(),result.getOut(), result.getExitCode());
     }
 
 
@@ -141,7 +154,7 @@ public class Project4Test extends InvokeMainTestCase {
     }
 
     private String errorConnecting(){
-        return "** While contacting server: Connection refused,\n" +
+        return "** While contacting server: Connection refused: connect,\n" +
                 "Please try again with a a valid host name\n" +
                 "\n" +
                 "** Empty Exception\n" +
