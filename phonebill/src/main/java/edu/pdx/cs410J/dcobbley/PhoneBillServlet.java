@@ -31,19 +31,12 @@ public class PhoneBillServlet extends HttpServlet
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
-        System.out.println("LOGGING: doGet was called");
         response.setContentType( "text/plain" );
 
 
         String customer = getParameter( "customer", request );
         String startTime = getParameter( "startTime", request );
         String endTime = getParameter( "endTime", request );
-
-        System.out.println(customer);
-        System.out.println(startTime);
-        System.out.println(endTime);
-        System.out.println("END");
-
 
         //check to see if the date.customer == null
 
@@ -107,16 +100,33 @@ public class PhoneBillServlet extends HttpServlet
             phoneBill = data.get(customer);
             phoneBill.addPhoneCall(new phonecall(caller, callee, startTime, endTime));
             data.put(customer, phoneBill);
-            System.out.println("adding new phonecall");
-            pw.println("attempting to add a new phonecall to existing customer");
+            System.out.println("attempting to add new phonecall");
+
 
         }
         else{
             //Customer doesn't exist, create a new phonebill.
-            data.put(customer,new phonebill(customer, new phonecall(caller,callee,startTime,endTime)));
+            data.put(customer, new phonebill(customer, new phonecall(caller, callee, startTime, endTime)));
             System.out.println("new customer added");
             pw.println("attempting to add a new customer");
 
+        }
+
+        int counter=0;
+        Collection<phonecall> phoneCalls = data.get(customer).getPhoneCalls();
+        pw.println("  _____  _                        ____  _ _ _   ____   ___   ___   ___  \n" +
+                " |  __ \\| |                      |  _ \\(_) | | |___ \\ / _ \\ / _ \\ / _ \\ \n" +
+                " | |__) | |__   ___  _ __   ___  | |_) |_| | |   __) | | | | | | | | | |\n" +
+                " |  ___/| '_ \\ / _ \\| '_ \\ / _ \\ |  _ <| | | |  |__ <| | | | | | | | | |\n" +
+                " | |    | | | | (_) | | | |  __/ | |_) | | | |  ___) | |_| | |_| | |_| |\n" +
+                " |_|    |_| |_|\\___/|_| |_|\\___| |____/|_|_|_| |____/ \\___/ \\___/ \\___/ \n" +
+                "                                                                        \n" +
+                "                                                                        ");
+        pw.println("#     customer      caller      callee           Start Time        End Time        Duration \n");
+
+        for(phonecall call: phoneCalls){
+            pw.println(++counter +" "+ customer+ "  "+call.getCaller()+ "  "+call.getCallee()+"   "+call.getStartTimeString()+"  "+call.getEndTimeString()+  "   "+call.duration()+"\n");
+            //writer.write(++x +" "+mine.getCaller()+ "  "+mine.getCallee()+"   "+mine.getStartTimeString()+"  "+mine.getEndTimeString()+  "   "+mine.duration()+"\n");
         }
 
         pw.flush();
@@ -183,10 +193,23 @@ public class PhoneBillServlet extends HttpServlet
             pw.println("Searching for: " +data.get(customer).toString());
             Collection<phonecall> phoneCalls = data.get(customer).getPhoneCalls();
             boolean flag = true;
+            int counter = 0;
+            pw.println("  _____  _                        ____  _ _ _   ____   ___   ___   ___  \n" +
+                    " |  __ \\| |                      |  _ \\(_) | | |___ \\ / _ \\ / _ \\ / _ \\ \n" +
+                    " | |__) | |__   ___  _ __   ___  | |_) |_| | |   __) | | | | | | | | | |\n" +
+                    " |  ___/| '_ \\ / _ \\| '_ \\ / _ \\ |  _ <| | | |  |__ <| | | | | | | | | |\n" +
+                    " | |    | | | | (_) | | | |  __/ | |_) | | | |  ___) | |_| | |_| | |_| |\n" +
+                    " |_|    |_| |_|\\___/|_| |_|\\___| |____/|_|_|_| |____/ \\___/ \\___/ \\___/ \n" +
+                    "                                                                        \n" +
+                    "                                                                        ");
+            pw.println("#     customer      caller      callee           Start Time        End Time        Duration \n");
+
             for(phonecall call: phoneCalls){
                 if(begin>= (Long)call.startTime.getTime()&&begin<=(Long)call.endTime.getTime()){
                     flag = false;
-                    pw.println("Pretty print this "+ customer+" "+ call.toString());
+                    pw.println(++counter +" "+ customer+ "  "+call.getCaller()+ "  "+call.getCallee()+"   "+call.getStartTimeString()+"  "+call.getEndTimeString()+  "   "+call.duration()+"\n");
+                   //writer.write(++x +" "+mine.getCaller()+ "  "+mine.getCallee()+"   "+mine.getStartTimeString()+"  "+mine.getEndTimeString()+  "   "+mine.duration()+"\n");
+
                 }
             }
             if(flag){

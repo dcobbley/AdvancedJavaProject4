@@ -329,7 +329,22 @@ public class Project4 {
             }
             if(printFlag){
                 if (MySingleBill != null) {
-                    System.out.println("Customer: " + MySingleBill.getCustomer() + " " + MySingleBill.getPhoneCalls());
+                    System.out.println("Customer: " + MySingleBill.getCustomer() + " " + MySingleBill.singlePhoneCall);
+
+                    System.out.println("  _____  _                        ____  _ _ _   ____   ___   ___   ___  \n" +
+                            " |  __ \\| |                      |  _ \\(_) | | |___ \\ / _ \\ / _ \\ / _ \\ \n" +
+                            " | |__) | |__   ___  _ __   ___  | |_) |_| | |   __) | | | | | | | | | |\n" +
+                            " |  ___/| '_ \\ / _ \\| '_ \\ / _ \\ |  _ <| | | |  |__ <| | | | | | | | | |\n" +
+                            " | |    | | | | (_) | | | |  __/ | |_) | | | |  ___) | |_| | |_| | |_| |\n" +
+                            " |_|    |_| |_|\\___/|_| |_|\\___| |____/|_|_|_| |____/ \\___/ \\___/ \\___/ \n" +
+                            "                                                                        \n" +
+                            "                                                                        ");
+                    System.out.println("#     customer      caller      callee           Start Time        End Time        Duration \n");
+
+                        System.out.println("1" +" "+ MySingleBill.getCustomer()+ "  "+MySingleBill.singlePhoneCall.getCaller()+ "  "+MySingleBill.singlePhoneCall.getCallee()+"   "+MySingleBill.singlePhoneCall.getStartTimeString()+"  "+MySingleBill.singlePhoneCall.getEndTimeString()+  "   "+MySingleBill.singlePhoneCall.duration()+"\n");
+
+
+
                     printFlag = true;
                 } else {
                     //MyphoneBill is null, throw exception
