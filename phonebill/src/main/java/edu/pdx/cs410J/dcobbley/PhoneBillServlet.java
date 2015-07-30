@@ -173,8 +173,25 @@ public class PhoneBillServlet extends HttpServlet
         //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
         //pw.println(Messages.formatKeyValuePair( key, value ));
         //pw.println("WriteValue function to be displayed on server page");
-        if(data.get(customer)!= null)
-            pw.println(data.get(customer).toString());
+        if(data.get(customer)!= null) {
+            //pw.println(data.get(customer).toString());
+            int counter=0;
+            Collection<phonecall> phoneCalls = data.get(customer).getPhoneCalls();
+            pw.println("  _____  _                        ____  _ _ _   ____   ___   ___   ___  \n" +
+                    " |  __ \\| |                      |  _ \\(_) | | |___ \\ / _ \\ / _ \\ / _ \\ \n" +
+                    " | |__) | |__   ___  _ __   ___  | |_) |_| | |   __) | | | | | | | | | |\n" +
+                    " |  ___/| '_ \\ / _ \\| '_ \\ / _ \\ |  _ <| | | |  |__ <| | | | | | | | | |\n" +
+                    " | |    | | | | (_) | | | |  __/ | |_) | | | |  ___) | |_| | |_| | |_| |\n" +
+                    " |_|    |_| |_|\\___/|_| |_|\\___| |____/|_|_|_| |____/ \\___/ \\___/ \\___/ \n" +
+                    "                                                                        \n" +
+                    "                                                                        ");
+            pw.println("#     customer      caller      callee           Start Time        End Time        Duration \n");
+
+            for(phonecall call: phoneCalls){
+                pw.println(++counter +" "+ customer+ "  "+call.getCaller()+ "  "+call.getCallee()+"   "+call.getStartTimeString()+"  "+call.getEndTimeString()+  "   "+call.duration()+"\n");
+                //writer.write(++x +" "+mine.getCaller()+ "  "+mine.getCallee()+"   "+mine.getStartTimeString()+"  "+mine.getEndTimeString()+  "   "+mine.duration()+"\n");
+            }
+        }
         else
             pw.println("Customer does not exists");
 
